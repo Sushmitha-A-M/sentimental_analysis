@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>🖤 Emotion Detection</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <h1>🖤 Emotion Detection</h1>
+  <div class="layout">
+    <div class="video-box">
+      <img id="videoFeed" src="{{ url_for('video_feed') }}" alt="Webcam Feed">
+    </div>
+    <div class="emotion-box">
+      <h2>Detected Emotion</h2>
+      <p id="emotion">🙂 Neutral — 0%</p>
+    </div>
+  </div>
+
+  <script>
+    async function fetchEmotion() {
+      try {
+        const response = await fetch("/emotion");
+        const data = await response.json();
+        if (data && data.emotion && data.score !== undefined) {
+          let emoji = "🙂";
+          switch (data.emotion.toLowerCase()) {
+            case "happy": emoji = "😄"; break;
+            case "sad": emoji = "😢"; break;
+            case "angry": emoji = "😠"; break;
+            case "surprise": emoji = "😲"; break;
+            case "fear": emoji = "😨"; break;
+            case "disgust": emoji = "🤢"; break;
+            default: emoji = "🙂";
+          }
+          document.getElementById("emotion").textContent =
+            `${emoji} ${data.emotion} — ${(data.score * 100).toFixed(1)}%`;
+        }
+      } catch (err) {
+        console.error("Error fetching emotion:", err);
+      }
+    }
+    setInterval(fetchEmotion, 2000);
+  </script>
+</body>
+</html>
